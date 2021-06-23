@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/aop"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/util
+         https://www.springframework.org/schema/util/spring-util.xsd
+          http://www.springframework.org/schema/context
+          https://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--property-placeholder用于指定properties文件路径-->
+    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+
+<bean id="myDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    <property name="url" value="jdbc:mysql://localhost:3306/spring?serverTimezone=UTC&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false"></property>
+    <property name="username" value="${jdbc.username}"></property>
+    <property name="password" value="${jdbc.password}"></property>
+    <property name="maxActive" value="20"></property>
+</bean>
+    <!--用于声名事务管理器
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    </bean>-->
+
+
+    <!--?serverTimezone=UTC&amp;
+                  useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false-->
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="myDataSource"></property>
+    <property name="configLocation" value="classpath:mybatis.xml"></property>
+ </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+        <property name="basePackage" value="com.luxiany.dao"></property>
+    </bean>
+
+
+    <bean id="studentService" class="com.luxiany.service.impl.StudentServiceImpl">
+        <property name="studentDao" ref="studentDao"></property>
+     </bean>
+
+    <bean id="saleService" class="com.luxiany.service.impl.SaleServiceImpl">
+        <property name="saleDao" ref="saleDao"></property>
+        <property name="goodsDao" ref="goodsDao"></property>
+    </bean>
+
+</beans>
